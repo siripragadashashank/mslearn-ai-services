@@ -7,22 +7,18 @@ def main():
     global ai_endpoint
     global ai_key
 
-    try:
-        # Get Configuration Settings
-        load_dotenv()
-        ai_endpoint = os.getenv('AI_SERVICE_ENDPOINT')
-        ai_key = os.getenv('AI_SERVICE_KEY')
+    # Get Configuration Settings
+    load_dotenv()
+    ai_endpoint = os.getenv('AI_SERVICE_ENDPOINT')
+    ai_key = os.getenv('AI_SERVICE_KEY')
 
-        # Get user input (until they enter "quit")
-        userText =''
-        while userText.lower() != 'quit':
-            userText = input('Enter some text ("quit" to stop)\n')
-            if userText.lower() != 'quit':
-                GetLanguage(userText)
+    # Get user input (until they enter "quit")
+    user_text = ''
+    while user_text.lower() != 'quit':
+        user_text = input('Enter some text ("quit" to stop)\n')
+        if user_text.lower() != 'quit':
+            GetLanguage(user_text)
 
-
-    except Exception as ex:
-        print(ex)
 
 def GetLanguage(text):
     try:
@@ -46,12 +42,12 @@ def GetLanguage(text):
             'Content-Type': 'application/json',
             'Ocp-Apim-Subscription-Key': ai_key
         }
-
         # Use the Text Analytics language API
         conn.request("POST", "/text/analytics/v3.1/languages?", str(jsonBody).encode('utf-8'), headers)
 
         # Send the request
         response = conn.getresponse()
+
         data = response.read().decode("UTF-8")
 
         # If the call was successful, get the response
