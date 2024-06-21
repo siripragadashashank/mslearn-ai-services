@@ -17,59 +17,55 @@ def main():
     while user_text.lower() != 'quit':
         user_text = input('Enter some text ("quit" to stop)\n')
         if user_text.lower() != 'quit':
-            GetLanguage(user_text)
+            get_language(user_text)
 
 
-def GetLanguage(text):
-    try:
-        # Construct the JSON request body (a collection of documents, each with an ID and text)
-        jsonBody = {
-            "documents":[
-                {"id": 1,
-                 "text": text}
-            ]
-        }
+def get_language(text):
 
-        # Let's take a look at the JSON we'll send to the service
-        print(json.dumps(jsonBody, indent=2))
+    # Construct the JSON request body (a collection of documents, each with an ID and text)
+    json_body = {
+        "documents": [
+            {"id": 1,
+             "text": text}
+        ]
+    }
 
-        # Make an HTTP request to the REST interface
-        uri = ai_endpoint.rstrip('/').replace('https://', '')
-        conn = http.client.HTTPSConnection(uri)
+    # Let's take a look at the JSON we'll send to the service
+    print(json.dumps(json_body, indent=2))
 
-        # Add the authentication key to the request header
-        headers = {
-            'Content-Type': 'application/json',
-            'Ocp-Apim-Subscription-Key': ai_key
-        }
-        # Use the Text Analytics language API
-        conn.request("POST", "/text/analytics/v3.1/languages?", str(jsonBody).encode('utf-8'), headers)
+    # Make an HTTP request to the REST interface
+    uri = ai_endpoint.rstrip('/').replace('https://', '')
+    conn = http.client.HTTPSConnection(uri)
 
-        # Send the request
-        response = conn.getresponse()
+    # Add the authentication key to the request header
+    headers = {
+        'Content-Type': 'application/json',
+        'Ocp-Apim-Subscription-Key': ai_key
+    }
+    # Use the Text Analytics language API
+    conn.request("POST", "/text/analytics/v3.1/languages?", str(json_body).encode('utf-8'), headers)
 
-        data = response.read().decode("UTF-8")
+    # Send the request
+    response = conn.getresponse()
 
-        # If the call was successful, get the response
-        if response.status == 200:
+    data = response.read().decode("UTF-8")
 
-            # Display the JSON response in full (just so we can see it)
-            results = json.loads(data)
-            print(json.dumps(results, indent=2))
+    # If the call was successful, get the response
+    if response.status == 200:
 
-            # Extract the detected language name for each document
-            for document in results["documents"]:
-                print("\nLanguage:", document["detectedLanguage"]["name"])
+        # Display the JSON response in full (just so we can see it)
+        results = json.loads(data)
+        print(json.dumps(results, indent=2))
 
-        else:
-            # Something went wrong, write the whole response
-            print(data)
+        # Extract the detected language name for each document
+        for document in results["documents"]:
+            print("\nLanguage:", document["detectedLanguage"]["name"])
 
-        conn.close()
+    else:
+        # Something went wrong, write the whole response
+        print(data)
 
-
-    except Exception as ex:
-        print(ex)
+    conn.close()
 
 
 if __name__ == "__main__":
